@@ -1,6 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
+import { NgSelect2Module } from 'ng-select2';
 
 import { routes } from './app.route';
 import { AppComponent } from './app.component';
@@ -38,7 +39,8 @@ import { SongStore } from './stores/song.store';
 		AngularFirestoreModule,
 		RouterModule.forRoot(routes),
 		FormsModule,
-		HttpClientModule
+		HttpClientModule,
+		NgSelect2Module
 	],
 	providers: [
 		// Services

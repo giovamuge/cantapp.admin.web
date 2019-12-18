@@ -70,7 +70,8 @@ export class ListSongComponent implements OnInit {
 		this.store
 			.collections()
 			.subscribe(
-				(res: [SongModel]) => (this.songs = this.songsData = res)
+				(res: [SongModel]) =>
+					(this.songs = this.songsData = res.sort(this.onSortSong))
 			);
 	}
 
@@ -79,5 +80,19 @@ export class ListSongComponent implements OnInit {
 		this.songs = this.songsData.filter(
 			value => value.title.toLowerCase().indexOf(searchName) > -1
 		);
+	}
+
+	onSortSong = (a: SongModel, b: SongModel) => {
+		const nameA = a.title.toUpperCase(); // ignora maiuscole e minuscole
+		const nameB = b.title.toUpperCase(); // ignora maiuscole e minuscole
+		if (nameA < nameB) {
+			return -1;
+		}
+		if (nameA > nameB) {
+			return 1;
+		}
+
+		// i nomi devono essere uguali
+		return 0;
 	}
 }

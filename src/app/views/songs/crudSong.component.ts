@@ -61,9 +61,9 @@ import { NgForm } from '@angular/forms';
 					Modifica
 				</button>
 
-				<button class="btn btn-danger btn-block" (click)="onDelete()">
+				<!--<button class="btn btn-outlink-danger btn-block" (click)="onDelete()">
 					Elimina
-				</button>
+				</button>-->
 			</div>
 
 			<a

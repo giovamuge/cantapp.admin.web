@@ -134,7 +134,7 @@ export class LoginComponent {
 			.login(form.value.email, form.value.password)
 			.then(
 				succ => {
-					console.log(succ);
+					this.route.navigateByUrl('home/songs');
 				}
 				// 	this.userStore
 				// 		// uid == userId
