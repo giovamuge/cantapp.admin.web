@@ -3,6 +3,8 @@ import { SongStore } from 'src/app/stores/song.store';
 import { SongModel } from 'src/app/models/song.model';
 import { Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
+import { QueryModel } from 'src/app/models/query.model';
+import { AngularFirestore } from '@angular/fire/firestore';
 
 @Component({
 	selector: 'app-list-song',
@@ -57,10 +59,10 @@ import { NgForm } from '@angular/forms';
 				</ul>
 			</div>
 		</div>
-	`
+	`,
 })
 export class ListSongComponent implements OnInit {
-	constructor(private store: SongStore) {}
+	constructor(private store: SongStore, private db: AngularFirestore) {}
 
 	searchSong: string;
 	songs: Array<SongModel>;
@@ -78,8 +80,31 @@ export class ListSongComponent implements OnInit {
 	onSearch(form: NgForm) {
 		const searchName = form.value.searchName.toLowerCase();
 		this.songs = this.songsData.filter(
-			value => value.title.toLowerCase().indexOf(searchName) > -1
+			(value) => value.title.toLowerCase().indexOf(searchName) > -1
 		);
+
+		// test di ricerca falliti
+
+		// this.db
+		// 	.collection('songs', (ref) => {
+		// 		ref.orderBy('title')
+		// 			.startAt([searchName])
+		// 			.endAt([searchName + '\uf8ff']);
+
+		// 		return ref;
+		// 	})
+		// 	.get()
+		// 	.subscribe((y) => {
+		// 		console.log(y);
+		// 		const datas: [{}] = [{}];
+		// 		y.forEach((k) => datas.push({ id: k.id, ...k.data() }));
+		// 		datas.splice(0, 1);
+		// 		console.log(datas);
+		// 	});
+
+		// const query = new Array<QueryModel>();
+		// query.push(new QueryModel('title', '<=', searchName));
+		// this.store.query(query).subscribe((songs) => console.log(songs));
 	}
 
 	onSortSong = (a: SongModel, b: SongModel) => {
@@ -94,5 +119,5 @@ export class ListSongComponent implements OnInit {
 
 		// i nomi devono essere uguali
 		return 0;
-	}
+	};
 }

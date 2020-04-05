@@ -23,9 +23,8 @@ import { Component, OnInit } from '@angular/core';
 
 							<!-- Subheading -->
 							<p class="text-muted mb-4">
-								Se ritieni che il link della pagina è corretta
-								contatta il servizio clienti Sime
-								Telecomunicazioni SPA
+								Mi dispiace stai cercando una pagina
+								inesistente. Torna alla pagina di login.
 							</p>
 
 							<!-- Button -->
@@ -42,7 +41,7 @@ import { Component, OnInit } from '@angular/core';
 			</div>
 			<!-- / .container -->
 		</div>
-	`
+	`,
 })
 export class NotFoundComponent implements OnInit {
 	constructor() {}

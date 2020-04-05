@@ -4,7 +4,6 @@ import { AuthService } from '../services/auth.service';
 import { Route, ActivatedRoute, Router } from '@angular/router';
 import { UserStore } from '../stores/user.store';
 import { AuthStore } from '../services/auth.store';
-import { UserModel } from '../models/user.model';
 import { SweetalertService } from '../services/sweetalert.service';
 
 @Component({
@@ -134,7 +133,7 @@ export class LoginComponent {
 			.login(form.value.email, form.value.password)
 			.then(
 				succ => {
-					this.route.navigateByUrl('home/songs');
+					this.route.navigateByUrl('it/songs');
 				}
 				// 	this.userStore
 				// 		// uid == userId
