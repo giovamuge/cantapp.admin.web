@@ -10,10 +10,11 @@ export const onWriteSong = functions.firestore
 		const newSong = snap.after.data();
 		return admin
 			.firestore(app)
-			.doc(`users/${context.params.songId}`)
+			.doc(`songs/${context.params.songId}`)
 			.set({
 				title: newSong?.title,
-				lyric: newSong?.lyric,
+                lyric: newSong?.lyric,
+                categories: newSong?.categories,
 				keywords: utils.createKeywords(newSong?.title),
 			});
 	});
