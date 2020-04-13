@@ -19,7 +19,7 @@ import { Component, OnInit } from '@angular/core';
 			<div class="collapse navbar-collapse" id="navbarNav">
 				<ul class="navbar-nav">
 					<li class="nav-item active">
-						<a class="nav-link" href="#"
+						<a class="nav-link" href="it/songs"
 							>Canzoni <span class="sr-only">(current)</span></a
 						>
 					</li>

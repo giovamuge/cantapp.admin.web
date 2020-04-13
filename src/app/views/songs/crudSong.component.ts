@@ -3,9 +3,11 @@ import { Location } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { SongStore } from 'src/app/stores/song.store';
 import { SongModel } from 'src/app/models/song.model';
+import { NgForm } from '@angular/forms';
+import { categories, Category } from 'src/app/models/category.model';
+import { Select2OptionData } from 'ng-select2';
 
 import * as quill from 'quill';
-import { NgForm } from '@angular/forms';
 
 @Component({
 	selector: 'app-crud-song',
@@ -26,6 +28,24 @@ import { NgForm } from '@angular/forms';
 					/>
 				</div>
 				<div class="form-group mt-5">
+					<label> Categorie</label>
+					<div class="row">
+						<div class="col-md-5">
+							<ng-select2
+								[options]="{
+									multiple: true,
+									width: 350
+								}"
+								[(ngModel)]="categories"
+								[data]="categoriesArray"
+								name="categories"
+								[placeholder]="'Seleziona categorie'"
+							>
+							</ng-select2>
+						</div>
+					</div>
+				</div>
+				<div class="form-group mt-5">
 					<label> Testo</label>
 					<!--<small class="form-text text-muted">
 						il nome utente sarà generato in automatico</small
@@ -40,6 +60,14 @@ import { NgForm } from '@angular/forms';
 					<!--<textarea class="col"  #lyricRef></textarea>-->
 					<div #lyricRef data-toggle="quill" id="lyricRef"></div>
 					<!--<quill-editor></quill-editor>-->
+				</div>
+				<div class="form-group mt-5">
+					<label> Accordi</label>
+					<!--<small class="form-text text-muted">
+						il nome utente sarà generato in automatico</small
+					>-->
+
+					<div #chordRef data-toggle="quill" id="chordRef"></div>
 				</div>
 			</form>
 
@@ -73,7 +101,7 @@ import { NgForm } from '@angular/forms';
 				Annulla
 			</a>
 		</div>
-	`
+	`,
 })
 export class CrudSongComponent implements OnInit {
 	constructor(
@@ -84,26 +112,38 @@ export class CrudSongComponent implements OnInit {
 
 	@ViewChild('lyricRef')
 	lyricElement: ElementRef;
+	@ViewChild('chordRef')
+	chordElement: ElementRef;
 	lyricInput;
 	id: string;
 	title: string;
 	song: SongModel;
-	editor: any;
+	lyricEditor: any;
+	chordEditor: any;
+	categoriesArray: Array<Select2OptionData>;
+	categories;
 
 	editorConfig = {
 		theme: 'snow',
 		modules: {
-			toolbar: ['bold']
-		}
+			toolbar: ['bold'],
+		},
 	};
 
 	ngOnInit() {
-		this.editor = new quill(
+		this.categoriesLoad();
+
+		this.lyricEditor = new quill(
 			this.lyricElement.nativeElement,
 			this.editorConfig
 		);
 
-		this.route.params.subscribe(params => {
+		this.chordEditor = new quill(
+			this.chordElement.nativeElement,
+			this.editorConfig
+		);
+
+		this.route.params.subscribe((params) => {
 			if (!params.id) {
 				return;
 			}
@@ -113,30 +153,41 @@ export class CrudSongComponent implements OnInit {
 				this.song = new SongModel();
 				this.song.title = res.title;
 				this.song.lyric = res.lyric;
+				this.song.chord = res.chord;
 				this.title = this.song.title;
-				this.editor.pasteHTML(this.song.lyricHtml);
+				this.lyricEditor.pasteHTML(this.song.lyricHtml);
+				this.chordEditor.pasteHTML(this.song.chordHtml);
+				this.categories = res.categories;
+
+				console.log(this.song);
 			});
 		});
 	}
 
 	onSaveOrUpdate(form: NgForm) {
 		const data = new SongModel();
-		data.lyric = form.value.title;
-		const lyricHTML = this.editor.root.innerHTML;
+		data.title = form.value.title;
+		const lyricHTML = this.lyricEditor.root.innerHTML;
 		data.setHTML(lyricHTML);
+		const chordHTML = this.chordEditor.root.innerHTML;
+		data.setChordHTML(chordHTML);
+		data.categories = this.categories;
+
+		// console.log(data);
+		// return;
 
 		if (this.id) {
 			this.store
 				.update(this.id, Object.assign({}, data))
 				.then(() => alert('Canzone modificata con successo'))
-				.catch(err => console.error(err));
+				.catch((err) => console.error(err));
 			return;
 		}
 
 		this.store
 			.add(Object.assign({}, data))
 			.then(() => alert('Canzone aggiunto con successo'))
-			.catch(err => console.error(err));
+			.catch((err) => console.error(err));
 	}
 
 	onDelete() {
@@ -147,5 +198,14 @@ export class CrudSongComponent implements OnInit {
 				.delete(this.id)
 				.then(() => alert(`${this.song.title} eliminato!`));
 		}
+	}
+
+	categoriesLoad() {
+		this.categoriesArray = categories.map((y: Category) =>
+			Object.create({
+				id: y.value,
+				text: y.title,
+			} as Select2OptionData)
+		) as [Select2OptionData];
 	}
 }

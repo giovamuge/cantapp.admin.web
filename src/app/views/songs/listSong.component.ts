@@ -101,5 +101,5 @@ export class ListSongComponent implements OnInit {
 
 		// i nomi devono essere uguali
 		return 0;
-	};
+	}
 }

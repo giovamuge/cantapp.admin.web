@@ -7,11 +7,11 @@ import { CrudSongComponent } from './views/songs/crudSong.component';
 import { RootComponent } from './views/root.view';
 
 export const routes: Routes = [
-	// { path: '', redirectTo: 'home/meeting/calendar', pathMatch: 'full' },
+	{ path: '', redirectTo: 'it/songs', pathMatch: 'full' },
 	{
 		path: 'login',
 		// canActivate: [AuthGuard],
-		component: LoginComponent
+		component: LoginComponent,
 	},
 	{
 		path: 'it',
@@ -23,20 +23,20 @@ export const routes: Routes = [
 				children: [
 					{
 						path: '',
-						component: ListSongComponent
+						component: ListSongComponent,
 					},
 					{
 						path: 'crud',
-						component: CrudSongComponent
+						component: CrudSongComponent,
 					},
 					{
 						path: 'crud/:id',
-						component: CrudSongComponent
-					}
-				]
-			}
-		]
+						component: CrudSongComponent,
+					},
+				],
+			},
+		],
 	},
 	{ path: '404', component: NotFoundComponent },
-	{ path: '**', redirectTo: '/404' }
+	{ path: '**', redirectTo: '/404' },
 ];
