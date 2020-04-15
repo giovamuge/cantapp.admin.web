@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { SongStore } from 'src/app/stores/song.store';
 import { SongModel } from 'src/app/models/song.model';
-import { Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
 import { QueryModel } from 'src/app/models/query.model';
 import { AngularFirestore } from '@angular/fire/firestore';
@@ -11,12 +10,10 @@ import { AngularFirestore } from '@angular/fire/firestore';
 	template: `
 		<div class="card mt-5">
 			<div class="card-header">
-				<!--<ul class="navbar-nav mr-auto">
-					<li>Lista canzoni</li>
-				</ul>-->
 				<div class="row align-items-center">
 					<div class="col">
-						<h5 class="card-title">Lista canzoni</h5>
+						<h5 class="card-title mb-0">Lista canzoni</h5>
+						<small>Inserisci una <a routerLink="/it/songs/crud">nuova canzone </a></small>
 					</div>
 					<div class="col">
 						<form
@@ -101,5 +98,5 @@ export class ListSongComponent implements OnInit {
 
 		// i nomi devono essere uguali
 		return 0;
-	}
+	};
 }

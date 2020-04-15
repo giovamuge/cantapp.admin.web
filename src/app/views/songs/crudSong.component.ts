@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { Location } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { SongStore } from 'src/app/stores/song.store';
-import { SongModel } from 'src/app/models/song.model';
+import { SongModel, ILinkModel } from 'src/app/models/song.model';
 import { NgForm } from '@angular/forms';
 import { categories, Category } from 'src/app/models/category.model';
 import { Select2OptionData } from 'ng-select2';
@@ -19,7 +19,7 @@ import * as quill from 'quill';
 		></sy-header>-->
 			<form #songForm="ngForm">
 				<div class="form-group mt-5">
-					<label> Titolo</label>
+					<label>Titolo</label>
 					<input
 						[(ngModel)]="title"
 						name="title"
@@ -28,13 +28,13 @@ import * as quill from 'quill';
 					/>
 				</div>
 				<div class="form-group mt-5">
-					<label> Categorie</label>
+					<label>Categorie</label>
 					<div class="row">
 						<div class="col-md-5">
 							<ng-select2
 								[options]="{
 									multiple: true,
-									width: 350
+									width: 315
 								}"
 								[(ngModel)]="categories"
 								[data]="categoriesArray"
@@ -46,23 +46,85 @@ import * as quill from 'quill';
 					</div>
 				</div>
 				<div class="form-group mt-5">
-					<label> Testo</label>
+					<label>Link</label>
+					<div class="row col">
+						<select
+							class="form-control col-sm-2 mr-2"
+							name="typeModel"
+							[(ngModel)]="typeModel"
+						>
+							<option value="null">Tipo link</option>
+							<option value="audio">Audio MP3</option>
+							<option value="youtube">YouTube</option>
+						</select>
+						<input
+							class="form-control col-sm-2 mr-2"
+							placeholder="Titolo"
+							name="titleModel"
+							[(ngModel)]="titleModel"
+						/>
+						<input
+							class="form-control col-sm-5 mr-2"
+							placeholder="https://"
+							name="urlModel"
+							[(ngModel)]="urlModel"
+						/>
+						<button
+							class="btn btn-link col-sm-2"
+							(click)="addLink()"
+							[disabled]="!typeModel || !urlModel || !titleModel"
+						>
+							Aggiungi
+						</button>
+
+						<!--<ul class="list-group mt-2">
+							<li class="list-group-item">
+								{{ link.type }} {{ link.title }} {{ link.url }}
+							</li>
+						</ul>-->
+						<div *ngIf="links && links.length > 0" class="table-responsive">
+							<table class="table mt-3">
+								<thead>
+									<tr>
+										<th>Tipo</th>
+										<th>Titolo</th>
+										<th>Url</th>
+										<th></th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr
+										*ngFor="
+											let link of links;
+											let index = $index
+										"
+									>
+										<td>{{ link.type }}</td>
+										<td>{{ link.title }}</td>
+										<td>{{ link.url }}</td>
+										<td>
+											<button
+												class="btn btn-link"
+												(click)="removeLink(index)"
+											>
+												rimuovi
+											</button>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+				<div class="form-group mt-5">
+					<label>Testo</label>
 					<!--<small class="form-text text-muted">
 						il nome utente sarà generato in automatico</small
 					>-->
-					<!--<input
-						#usernameEl
-						[(ngModel)]="username"
-						name="username"
-						type="text"
-						class="form-control col-sm-6"
-                    />-->
-					<!--<textarea class="col"  #lyricRef></textarea>-->
 					<div #lyricRef data-toggle="quill" id="lyricRef"></div>
-					<!--<quill-editor></quill-editor>-->
 				</div>
 				<div class="form-group mt-5">
-					<label> Accordi</label>
+					<label>Accordi</label>
 					<!--<small class="form-text text-muted">
 						il nome utente sarà generato in automatico</small
 					>-->
@@ -121,7 +183,11 @@ export class CrudSongComponent implements OnInit {
 	lyricEditor: any;
 	chordEditor: any;
 	categoriesArray: Array<Select2OptionData>;
-	categories;
+	categories: [string];
+	links: Array<ILinkModel>;
+	typeModel = 'null';
+	urlModel: string;
+	titleModel: string;
 
 	editorConfig = {
 		theme: 'snow',
@@ -158,8 +224,6 @@ export class CrudSongComponent implements OnInit {
 				this.lyricEditor.pasteHTML(this.song.lyricHtml);
 				this.chordEditor.pasteHTML(this.song.chordHtml);
 				this.categories = res.categories;
-
-				console.log(this.song);
 			});
 		});
 	}
@@ -168,13 +232,17 @@ export class CrudSongComponent implements OnInit {
 		const data = new SongModel();
 		data.title = form.value.title;
 		const lyricHTML = this.lyricEditor.root.innerHTML;
-		data.setHTML(lyricHTML);
+		data.setHTML(lyricHTML); // .value per eseguire decode html to ASCII
 		const chordHTML = this.chordEditor.root.innerHTML;
-		data.setChordHTML(chordHTML);
-		data.categories = this.categories;
+		data.setChordHTML(decodeURI(chordHTML)); // .value per eseguire decode html to ASCII
 
-		// console.log(data);
-		// return;
+		if (this.categories && this.categories.length > 0) {
+			data.categories = this.categories;
+		}
+
+		if (this.links && this.links.length > 0) {
+			data.links = this.links as [ILinkModel];
+		}
 
 		if (this.id) {
 			this.store
@@ -198,6 +266,24 @@ export class CrudSongComponent implements OnInit {
 				.delete(this.id)
 				.then(() => alert(`${this.song.title} eliminato!`));
 		}
+	}
+
+	addLink() {
+		if (!this.links) {
+			this.links = new Array();
+		}
+
+		const data: ILinkModel = {
+			type: this.typeModel,
+			title: this.titleModel,
+			url: this.urlModel,
+		};
+		this.links.push(data);
+		console.log(data);
+	}
+
+	removeLink(index) {
+		this.links.splice(index, 1);
 	}
 
 	categoriesLoad() {

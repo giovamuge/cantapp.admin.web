@@ -3,7 +3,8 @@ export interface ISongModel {
 	title: string;
 	lyric: string;
 	chord: string;
-	categories: [string];
+	categories?: [string];
+	links?: [ILinkModel];
 }
 
 export class SongModel implements ISongModel {
@@ -11,7 +12,8 @@ export class SongModel implements ISongModel {
 	title: string;
 	lyric: string;
 	chord: string;
-	categories: [string];
+	categories?: [string];
+	links?: [ILinkModel];
 
 	get lyricHtml() {
 		if (!this.lyric) {
@@ -31,12 +33,12 @@ export class SongModel implements ISongModel {
 	setHTML(value: string) {
 		this.lyric = value
 			.replace(/<p>/g, '')
+			.replace(/&nbsp;/g, ' ')
 			.replace(/<\/p>/g, '\n')
 			.replace(/<br>/g, '\n')
 			.replace(/(<strong>)/g, '{b}')
 			.replace(/(<\/strong>)/g, '{/b}');
 	}
-
 
 	get chordHtml() {
 		if (!this.chord) {
@@ -56,9 +58,16 @@ export class SongModel implements ISongModel {
 	setChordHTML(value: string) {
 		this.chord = value
 			.replace(/<p>/g, '')
+			.replace(/&nbsp;/g, ' ')
 			.replace(/<\/p>/g, '\n')
 			.replace(/<br>/g, '\n')
 			.replace(/(<strong>)/g, '{b}')
 			.replace(/(<\/strong>)/g, '{/b}');
 	}
+}
+
+export interface ILinkModel {
+	title: string;
+	type: string;
+	url: string;
 }
