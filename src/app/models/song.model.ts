@@ -5,6 +5,9 @@ export interface ISongModel {
 	chord: string;
 	categories?: [string];
 	links?: [ILinkModel];
+	numberViews: number;
+	CreatedAt: Date;
+	UpdatedAt?: Date;
 }
 
 export class SongModel implements ISongModel {
@@ -14,6 +17,9 @@ export class SongModel implements ISongModel {
 	chord: string;
 	categories?: [string];
 	links?: [ILinkModel];
+	numberViews: number;
+	CreatedAt: Date;
+	UpdatedAt?: Date;
 
 	get lyricHtml() {
 		if (!this.lyric) {
@@ -34,6 +40,8 @@ export class SongModel implements ISongModel {
 		this.lyric = value
 			.replace(/<p>/g, '')
 			.replace(/&nbsp;/g, ' ')
+			.replace(/<em>/g, '')
+			.replace(/<\/em>/g, '')
 			.replace(/<\/p>/g, '\n')
 			.replace(/<br>/g, '\n')
 			.replace(/(<strong>)/g, '{b}')
@@ -59,6 +67,8 @@ export class SongModel implements ISongModel {
 		this.chord = value
 			.replace(/<p>/g, '')
 			.replace(/&nbsp;/g, ' ')
+			.replace(/<\/em>/g, '')
+			.replace(/<\/p>/g, '\n')
 			.replace(/<\/p>/g, '\n')
 			.replace(/<br>/g, '\n')
 			.replace(/(<strong>)/g, '{b}')
