@@ -44,17 +44,16 @@ export const incrementView = functions.https.onRequest((req, res) => {
 		// [END usingMiddleware]
 		// Reading date format from URL query parameter.
 		// [START readQueryParam]
-		const userId = req.query.userId;
+		const songId = req.query.songId;
 		// [END readQueryParam]
 		// Reading date format from request body query parameter
-		if (!userId) {
+		if (!songId) {
 			// [START readBodyParam]
 			res.status(501).send('song id not exist');
 			return;
 			// [END readBodyParam]
 		}
 		// [START sendResponse]
-		const songId = req.query.songId;
 		return admin
 			.firestore(app)
 			.doc(`songs/${songId}`)

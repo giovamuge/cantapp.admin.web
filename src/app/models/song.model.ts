@@ -8,6 +8,7 @@ export interface ISongModel {
 	numberViews: number;
 	CreatedAt: Date;
 	UpdatedAt?: Date;
+	artist: string;
 }
 
 export class SongModel implements ISongModel {
@@ -20,6 +21,7 @@ export class SongModel implements ISongModel {
 	numberViews: number;
 	CreatedAt: Date;
 	UpdatedAt?: Date;
+	artist: string;
 
 	get lyricHtml() {
 		if (!this.lyric) {
