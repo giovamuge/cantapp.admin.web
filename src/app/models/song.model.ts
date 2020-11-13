@@ -9,6 +9,7 @@ export interface ISongModel {
 	CreatedAt: Date;
 	UpdatedAt?: Date;
 	artist: string;
+	keywords: [string];
 }
 
 export class SongModel implements ISongModel {
@@ -22,6 +23,7 @@ export class SongModel implements ISongModel {
 	CreatedAt: Date;
 	UpdatedAt?: Date;
 	artist: string;
+	keywords: [string];
 
 	get lyricHtml() {
 		if (!this.lyric) {
