@@ -11,8 +11,7 @@ import * as quill from "quill";
 import { SongUtil } from "src/app/utils/song.util";
 import * as firebase from "firebase";
 import { DocumentReference } from "@angular/fire/firestore";
-// import algoliasearch from "algoliasearch/dist/algoliasearch";
-// import { DocumentReference } from "@google-cloud/firestore";
+import algoliasearch from "algoliasearch/dist/algoliasearch";
 
 @Component({
   selector: "app-crud-song",
@@ -254,7 +253,10 @@ export class CrudSongComponent implements OnInit {
     if (this.id) {
       this.store
         .update(this.id, Object.assign({}, data))
-        .then(() => this.addOrUpdateAlgolia(data))
+        .then(() => {
+          data.id = this.id;
+          this.addOrUpdateAlgolia(data);
+        })
         .then(() => alert("Canzone modificata con successo"))
         .catch((err) => console.error(err));
       return;
@@ -262,9 +264,9 @@ export class CrudSongComponent implements OnInit {
 
     this.store
       .add(Object.assign({}, data))
-      .then((res: DocumentReference) => {
+      .then(async (res: DocumentReference) => {
         data.id = res.id;
-        this.addOrUpdateAlgolia(data);
+        await this.addOrUpdateAlgolia(data);
       })
       .then(() => alert("Canzone aggiunto con successo"))
       .catch((err) => console.error(err));
@@ -307,25 +309,24 @@ export class CrudSongComponent implements OnInit {
     ) as [Select2OptionData];
   }
 
-  addOrUpdateAlgolia(song: SongModel) {
+  async addOrUpdateAlgolia(song: SongModel) {
     const remoteConfig = firebase.remoteConfig();
-    remoteConfig.settings = {
-      minimumFetchIntervalMillis: 3600000,
-      fetchTimeoutMillis: 3600000,
-    };
 
     // Initialize Algolia, requires installing Algolia dependencies:
     // https://www.algolia.com/doc/api-client/javascript/getting-started/#install
     //
     // App ID and API Key are stored in functions config variables
     // const ALGOLIA_SEARCH_KEY = remoteConfig.getValue('algolia_search_key').asString();
-    const ALGOLIA_ID = remoteConfig.getValue("algolia_app_id").asString();
-    const ALGOLIA_ADMIN_KEY = remoteConfig
-      .getValue("algolia_api_key")
-      .asString();
 
+    // await remoteConfig.getString("algolia_app_id")
+    // const ALGOLIA_ID = "MYFNFA4QU7";
+    // const ALGOLIA_ADMIN_KEY = "3ba30ae0f39e292ffed2a11e70ebbdbb";
+
+	await remoteConfig.fetchAndActivate();
+    const ALGOLIA_ID = remoteConfig.getString("algolia_app_id");
+    const ALGOLIA_ADMIN_KEY = remoteConfig.getString("algolia_api_key");
     const ALGOLIA_INDEX_NAME = "dev_SONGS";
-    // const client = algoliasearch(ALGOLIA_ID, ALGOLIA_ADMIN_KEY);
+    const client = algoliasearch(ALGOLIA_ID, ALGOLIA_ADMIN_KEY);
 
     // Add an 'objectID' field which Algolia requires
     const songAlgolia = {
@@ -335,8 +336,8 @@ export class CrudSongComponent implements OnInit {
     };
 
     // Write to the algolia index
-    // const index = client.initIndex(ALGOLIA_INDEX_NAME);
-    // return index.saveObject(songAlgolia);
+    const index = client.initIndex(ALGOLIA_INDEX_NAME);
+    return index.saveObject(songAlgolia);
     return;
   }
 }
