@@ -1,26 +1,29 @@
 import { Component, OnInit, ViewChild, ElementRef } from "@angular/core";
 import { Location } from "@angular/common";
-import { ActivatedRoute } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 import { SongStore } from "src/app/stores/song.store";
 import { SongModel, ILinkModel } from "src/app/models/song.model";
 import { NgForm } from "@angular/forms";
 import { categories, Category } from "src/app/models/category.model";
 import { Select2OptionData } from "ng-select2";
+import { first } from "rxjs/operators";
 
 import * as quill from "quill";
 import { SongUtil } from "src/app/utils/song.util";
 import * as firebase from "firebase";
-import { DocumentReference } from "@angular/fire/firestore";
+import { AngularFirestore, DocumentReference } from "@angular/fire/firestore";
 import algoliasearch from "algoliasearch/dist/algoliasearch";
+import { QueryModel } from "src/app/models/query.model";
+import { Route } from "@angular/compiler/src/core";
 
 @Component({
   selector: "app-crud-song",
   template: `
     <div class="container">
       <!--<sy-header
-			[title]="'Meeting'"
-			[preTitle]="'aggiungi o rimuovi meeting'"
-		></sy-header>-->
+            [title]="'Meeting'"
+            [preTitle]="'aggiungi o rimuovi meeting'"
+        ></sy-header>-->
       <form #songForm="ngForm">
         <div class="form-group mt-5">
           <label>Titolo</label>
@@ -29,6 +32,15 @@ import algoliasearch from "algoliasearch/dist/algoliasearch";
             name="title"
             type="text"
             class="form-control col-sm-6"
+          />
+        </div>
+        <div class="form-group mt-5">
+          <label>Artista</label>
+          <input
+            [(ngModel)]="artist"
+            name="artist"
+            type="text"
+            class="form-control col-sm-4"
           />
         </div>
         <div class="form-group mt-5">
@@ -82,10 +94,10 @@ import algoliasearch from "algoliasearch/dist/algoliasearch";
             </button>
 
             <!--<ul class="list-group mt-2">
-							<li class="list-group-item">
-								{{ link.type }} {{ link.title }} {{ link.url }}
-							</li>
-						</ul>-->
+                            <li class="list-group-item">
+                                {{ link.type }} {{ link.title }} {{ link.url }}
+                            </li>
+                        </ul>-->
             <div *ngIf="links && links.length > 0" class="table-responsive">
               <table class="table mt-3">
                 <thead>
@@ -115,15 +127,15 @@ import algoliasearch from "algoliasearch/dist/algoliasearch";
         <div class="form-group mt-5">
           <label>Testo</label>
           <!--<small class="form-text text-muted">
-						il nome utente sarà generato in automatico</small
-					>-->
+                        il nome utente sarà generato in automatico</small
+                    >-->
           <div #lyricRef data-toggle="quill" id="lyricRef"></div>
         </div>
         <div class="form-group mt-5">
           <label>Accordi</label>
           <!--<small class="form-text text-muted">
-						il nome utente sarà generato in automatico</small
-					>-->
+                        il nome utente sarà generato in automatico</small
+                    >-->
 
           <div #chordRef data-toggle="quill" id="chordRef"></div>
         </div>
@@ -148,8 +160,8 @@ import algoliasearch from "algoliasearch/dist/algoliasearch";
         </button>
 
         <!--<button class="btn btn-outlink-danger btn-block" (click)="onDelete()">
-					Elimina
-				</button>-->
+                    Elimina
+                </button>-->
       </div>
 
       <a (click)="location.back()" class="btn btn-block btn-link text-muted">
@@ -162,7 +174,9 @@ export class CrudSongComponent implements OnInit {
   constructor(
     public location: Location,
     private route: ActivatedRoute,
-    private store: SongStore
+    private router: Router,
+    private store: SongStore,
+    private db: AngularFirestore
   ) {}
 
   @ViewChild("lyricRef")
@@ -172,6 +186,7 @@ export class CrudSongComponent implements OnInit {
   lyricInput;
   id: string;
   title: string;
+  artist: string;
   song: SongModel;
   lyricEditor: any;
   chordEditor: any;
@@ -211,9 +226,11 @@ export class CrudSongComponent implements OnInit {
       this.store.get(this.id).subscribe((res: SongModel) => {
         this.song = new SongModel();
         this.song.title = res.title;
+        this.song.artist = res.artist;
         this.song.lyric = res.lyric;
         this.song.chord = res.chord;
         this.title = this.song.title;
+        this.artist = this.song.artist;
         this.lyricEditor.pasteHTML(this.song.lyricHtml);
         this.chordEditor.pasteHTML(this.song.chordHtml);
         this.categories = res.categories;
@@ -224,23 +241,12 @@ export class CrudSongComponent implements OnInit {
   onSaveOrUpdate(form: NgForm) {
     const data = new SongModel();
     data.title = form.value.title;
-    data.keywords = SongUtil.createKeywords(data.title);
+    data.artist = form.value.artist;
+    data.keywords = SongUtil.createKeywords(data.title.toLowerCase());
     const lyricHTML = this.lyricEditor.root.innerHTML;
     data.setHTML(lyricHTML); // .value per eseguire decode html to ASCII
     const chordHTML = this.chordEditor.root.innerHTML;
     data.setChordHTML(decodeURI(chordHTML)); // .value per eseguire decode html to ASCII
-
-    //   return admin
-    // 	.firestore()
-    // 	.doc(`songs/${context.params.songId}`)
-    // 	.update({
-    // 	  keywords: utils.createKeywords(newSong?.title),
-    // 	})
-    // 	.then(() => {
-    // 	  // Write to the algolia index
-    // 	  const index = client.initIndex(ALGOLIA_INDEX_NAME);
-    // 	  return index.saveObject(songAlgolia);
-    // 	});
 
     if (this.categories && this.categories.length > 0) {
       data.categories = this.categories;
@@ -253,23 +259,47 @@ export class CrudSongComponent implements OnInit {
     if (this.id) {
       this.store
         .update(this.id, Object.assign({}, data))
+        .catch((err) => console.error(err))
         .then(() => {
           data.id = this.id;
           this.addOrUpdateAlgolia(data);
         })
-        .then(() => alert("Canzone modificata con successo"))
-        .catch((err) => console.error(err));
+        .finally(() => {
+          const canContinue = confirm(
+            "Canzone modificata con successo, vuoi continuare con le modifiche?"
+          );
+
+          if (canContinue) {
+            this.router.navigateByUrl(`it/songs/crud/${data.id}`);
+          } else {
+            this.router.navigateByUrl(`it/songs`);
+          }
+        });
       return;
     }
 
-    this.store
-      .add(Object.assign({}, data))
-      .then(async (res: DocumentReference) => {
-        data.id = res.id;
-        await this.addOrUpdateAlgolia(data);
-      })
-      .then(() => alert("Canzone aggiunto con successo"))
-      .catch((err) => console.error(err));
+    this.reorderNumberSongs(data) // riordina numeru canzoni
+      .then((number: string) =>
+        this.store
+          .add(Object.assign({}, data, { number: number }))
+          .catch((err) => console.error(err))
+          .then(
+            async (res: DocumentReference) =>
+              await this.addOrUpdateAlgolia(
+                Object.assign({}, data, { id: res.id })
+              ).then(() => {
+                const canContinue = confirm(
+                  "Canzone aggiunta con successo, vuoi continuare con le modifiche?"
+                );
+
+                if (canContinue) {
+                  this.router.navigateByUrl(`it/songs/crud/${res.id}`);
+                } else {
+                  this.router.navigateByUrl(`it/songs`);
+                }
+              })
+          )
+      );
   }
 
   onDelete() {
@@ -322,7 +352,7 @@ export class CrudSongComponent implements OnInit {
     // const ALGOLIA_ID = "MYFNFA4QU7";
     // const ALGOLIA_ADMIN_KEY = "3ba30ae0f39e292ffed2a11e70ebbdbb";
 
-	await remoteConfig.fetchAndActivate();
+    await remoteConfig.fetchAndActivate();
     const ALGOLIA_ID = remoteConfig.getString("algolia_app_id");
     const ALGOLIA_ADMIN_KEY = remoteConfig.getString("algolia_api_key");
     const ALGOLIA_INDEX_NAME = "dev_SONGS";
@@ -338,6 +368,45 @@ export class CrudSongComponent implements OnInit {
     // Write to the algolia index
     const index = client.initIndex(ALGOLIA_INDEX_NAME);
     return index.saveObject(songAlgolia);
-    return;
+  }
+
+  reorderNumberSongs(song: SongModel): Promise<{}> {
+    return new Promise((resolve, reject) => {
+      this.store
+        .collections()
+        .pipe(first())
+        .subscribe((songs: [SongModel]) => {
+          const songsOrdered = songs.sort(SongUtil.onSortSong);
+          let index = -1;
+          let i = 0;
+          while (index < 0) {
+            const condition =
+              i == songsOrdered.length ||
+              song.title.toUpperCase() < songsOrdered[i].title.toUpperCase();
+            if (condition) {
+              index = i;
+            }
+            i++;
+          }
+          songsOrdered.splice(index, 0, song);
+          const db = this.db.firestore;
+          const startIndex = index + 1;
+          const batch = db.batch();
+          for (let k = startIndex; k < songsOrdered.length; k++) {
+            const ref = db.doc(`songs/${songsOrdered[k].id}`);
+            const count = k + 1;
+            const newNumber = {
+              number: `${count}`,
+            };
+            console.log(
+              `batch number ${count} id ${songsOrdered[k].id} title ${songsOrdered[k].title}`
+            );
+            batch.update(ref, newNumber);
+          }
+          // Commit the batch
+          batch.commit().then(() => resolve(`${index + 1}`));
+          // resolve(`${index + 1}`);
+        });
+    });
   }
 }

@@ -48,6 +48,9 @@ import { AngularFirestore } from "@angular/fire/firestore";
             class="list-group-item align-items-center"
             *ngFor="let song of songs"
           >
+            <span class="badge badge-primary badge-pill">{{
+              song.number
+            }}</span>
             {{ song.title }}
             <a
               class="btn btn-sm btn-outline-secondary float-right"
@@ -73,8 +76,8 @@ export class ListSongComponent implements OnInit {
       this.songs = this.songsData = res.sort(this.onSortSong);
       this.songs.forEach((x) => {
         delete x.keywords;
-		delete x.chord;
-		delete x.numberViews;
+        delete x.chord;
+        delete x.numberViews;
       });
       console.log(JSON.stringify(this.songs));
     });
@@ -83,7 +86,9 @@ export class ListSongComponent implements OnInit {
   onSearch(form: NgForm) {
     const searchName = form.value.searchName.toLowerCase();
     const query = new Array<QueryModel>();
-    query.push(new QueryModel("keywords", "array-contains", searchName));
+    if (searchName) {
+      query.push(new QueryModel("keywords", "array-contains", searchName));
+    }
     this.store
       .query(query)
       .subscribe(

@@ -3,6 +3,7 @@ export interface ISongModel {
 	title: string;
 	lyric: string;
 	chord: string;
+	number: string;
 	categories?: [string];
 	links?: [ILinkModel];
 	numberViews: number;
@@ -17,6 +18,7 @@ export class SongModel implements ISongModel {
 	title: string;
 	lyric: string;
 	chord: string;
+	number: string;
 	categories?: [string];
 	links?: [ILinkModel];
 	numberViews: number;
