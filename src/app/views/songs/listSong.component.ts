@@ -74,12 +74,28 @@ export class ListSongComponent implements OnInit {
   ngOnInit() {
     this.store.collections().subscribe((res: [SongModel]) => {
       this.songs = this.songsData = res.sort(this.onSortSong);
-      this.songs.forEach((x) => {
-        delete x.keywords;
-        delete x.chord;
-        delete x.numberViews;
-      });
-      console.log(JSON.stringify(this.songs));
+      // this.songs.forEach((x) => {
+      //   delete x.keywords;
+      //   delete x.chord;
+      //   delete x.numberViews;
+      // });
+      console.log(
+        JSON.stringify(
+          this.songs.map((x) =>
+            Object.assign(
+              {},
+              {
+                objectID: x.id,
+                title: x.title,
+                lyric: x.lyric
+                  .replace(/{\/b}/g, "")
+                  .replace(/{b}/g, "")
+                  .replace(/\n/g, ""),
+              }
+            )
+          )
+        )
+      );
     });
   }
 

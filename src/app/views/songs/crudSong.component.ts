@@ -15,6 +15,7 @@ import { AngularFirestore, DocumentReference } from "@angular/fire/firestore";
 import algoliasearch from "algoliasearch/dist/algoliasearch";
 import { QueryModel } from "src/app/models/query.model";
 import { Route } from "@angular/compiler/src/core";
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: "app-crud-song",
@@ -355,14 +356,17 @@ export class CrudSongComponent implements OnInit {
     await remoteConfig.fetchAndActivate();
     const ALGOLIA_ID = remoteConfig.getString("algolia_app_id");
     const ALGOLIA_ADMIN_KEY = remoteConfig.getString("algolia_api_key");
-    const ALGOLIA_INDEX_NAME = "dev_SONGS";
+    const ALGOLIA_INDEX_NAME = environment.algolia_indexs.songs;
     const client = algoliasearch(ALGOLIA_ID, ALGOLIA_ADMIN_KEY);
 
     // Add an 'objectID' field which Algolia requires
     const songAlgolia = {
       objectID: song.id,
-      lyric: song.lyric,
       title: song.title,
+      lyric: song.lyric
+        .replace(/{\/b}/g, "")
+        .replace(/{b}/g, "")
+        .replace(/\n/g, ""),
     };
 
     // Write to the algolia index
