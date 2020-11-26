@@ -1,4 +1,13 @@
 {
-  "indexes": [],
+  "indexes": [
+    {
+      "collectionGroup": "songs",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "categories", "arrayConfig": "ARRAYS" },
+        { "fieldPath": "title", "order": "ASCENDING" }
+      ]
+    }
+  ],
   "fieldOverrides": []
 }
