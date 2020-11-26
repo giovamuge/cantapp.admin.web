@@ -79,23 +79,23 @@ export class ListSongComponent implements OnInit {
       //   delete x.chord;
       //   delete x.numberViews;
       // });
-      console.log(
-        JSON.stringify(
-          this.songs.map((x) =>
-            Object.assign(
-              {},
-              {
-                objectID: x.id,
-                title: x.title,
-                lyric: x.lyric
-                  .replace(/{\/b}/g, "")
-                  .replace(/{b}/g, "")
-                  .replace(/\n/g, ""),
-              }
-            )
-          )
-        )
-      );
+      // console.log(
+      //   JSON.stringify(
+      //     this.songs.map((x) =>
+      //       Object.assign(
+      //         {},
+      //         {
+      //           objectID: x.id,
+      //           title: x.title,
+      //           lyric: x.lyric
+      //             .replace(/{\/b}/g, "")
+      //             .replace(/{b}/g, "")
+      //             .replace(/\n/g, ""),
+      //         }
+      //       )
+      //     )
+      //   )
+      // );
     });
   }
 
