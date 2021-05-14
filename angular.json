@@ -90,7 +90,7 @@
               "node_modules/instantsearch.css/themes/algolia.css"
             ],
             "scripts": [],
-            "assets": ["src/favicon.ico", "src/assets"]
+            "assets": ["src/favicon.ico", "src/assets", "src/app-ads.txt"]
           }
         },
         "lint": {
