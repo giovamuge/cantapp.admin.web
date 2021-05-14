@@ -71,7 +71,7 @@ import { AngularFirestore } from '@angular/fire/firestore';
                         <li class="page-item">
                             <button
                                 class="page-link"
-                                (click)="prevPage(first)"
+                                (click)="prevPage()"
                                 [disabled]="isFirst"
                             >
                                 Previous
@@ -80,7 +80,7 @@ import { AngularFirestore } from '@angular/fire/firestore';
                         <li class="page-item">
                             <button
                                 class="page-link"
-                                (click)="nextPage(last)"
+                                (click)="nextPage()"
                                 [disabled]="songs?.length < pageSize"
                             >
                                 Next

@@ -11,10 +11,10 @@ const algoliasearch_1 = require("algoliasearch");
 // const ALGOLIA_SEARCH_KEY = functions.config().algolia.search_key;
 const ALGOLIA_ID = functions.config().algolia.app_id;
 const ALGOLIA_ADMIN_KEY = functions.config().algolia.api_key;
-const ALGOLIA_INDEX_NAME = "dev_SONGS";
+const ALGOLIA_INDEX_NAME = 'dev_SONGS';
 const client = algoliasearch_1.default(ALGOLIA_ID, ALGOLIA_ADMIN_KEY);
 exports.onWriteSong = functions.firestore
-    .document("songs/{songId}")
+    .document('songs/{songId}')
     .onWrite((snap, context) => {
     const oldSong = snap.before.data();
     const newSong = snap.after.data();
@@ -39,15 +39,15 @@ exports.onWriteSong = functions.firestore
         return index.saveObject(songAlgolia);
     });
 });
-const cors = require("cors")({
+const cors = require('cors')({
     origin: true,
 });
 exports.incrementView = functions.https.onRequest((req, res) => {
     // [END trigger]
     // [START sendError]
     // Forbidding PUT requests.
-    if (req.method !== "PUT") {
-        return res.status(403).send("Forbidden!");
+    if (req.method !== 'PUT') {
+        return res.status(403).send('Forbidden!');
     }
     // [END sendError]
     // [START usingMiddleware]
@@ -61,7 +61,7 @@ exports.incrementView = functions.https.onRequest((req, res) => {
         // Reading date format from request body query parameter
         if (!songId) {
             // [START readBodyParam]
-            res.status(501).send("song id not exist");
+            res.status(501).send('song id not exist');
             return;
             // [END readBodyParam]
         }
@@ -69,8 +69,8 @@ exports.incrementView = functions.https.onRequest((req, res) => {
         return admin
             .firestore()
             .doc(`songs/${songId}`)
-            .update("numberViews", admin.firestore.FieldValue.increment(1))
-            .then(() => res.status(200).send("views incremented"));
+            .update('numberViews', admin.firestore.FieldValue.increment(1))
+            .then(() => res.status(200).send('views incremented'));
         // [END sendResponse]
     });
 });
