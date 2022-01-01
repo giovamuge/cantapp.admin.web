@@ -1,5 +1,14 @@
 {
   "projects": {
     "default": "mgc-cantapp"
+  },
+  "targets": {
+    "mgc-cantapp": {
+      "hosting": {
+        "admin": [
+          "admincantapp"
+        ]
+      }
+    }
   }
 }

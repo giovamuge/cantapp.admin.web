@@ -10,6 +10,7 @@
     ]
   },
   "hosting": {
+    "site": "admincantapp",
     "public": "public",
     "ignore": [
       "firebase.json",

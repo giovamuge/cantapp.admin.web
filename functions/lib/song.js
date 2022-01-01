@@ -18,20 +18,20 @@ exports.onWriteSong = functions.firestore
     .onWrite((snap, context) => {
     const oldSong = snap.before.data();
     const newSong = snap.after.data();
-    if (oldSong !== null && (oldSong === null || oldSong === void 0 ? void 0 : oldSong.title) === (newSong === null || newSong === void 0 ? void 0 : newSong.title)) {
+    if (oldSong !== null && oldSong ? .title === newSong ? .title :  : ) {
         return;
     }
     // Add an 'objectID' field which Algolia requires
     const songAlgolia = {
         objectID: context.params.songId,
-        lyric: newSong === null || newSong === void 0 ? void 0 : newSong.lyric,
-        title: newSong === null || newSong === void 0 ? void 0 : newSong.title,
+        lyric: newSong ? .lyric : ,
+        title: newSong ? .title : ,
     };
     return admin
         .firestore()
         .doc(`songs/${context.params.songId}`)
         .update({
-        keywords: utils.createKeywords(newSong === null || newSong === void 0 ? void 0 : newSong.title),
+        keywords: utils.createKeywords(newSong ? .title : ),
     })
         .then(() => {
         // Write to the algolia index
