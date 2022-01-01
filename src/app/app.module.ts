@@ -1,7 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
-import { NgSelect2Module } from 'ng-select2';
 
 import { routes } from './app.route';
 import { AppComponent } from './app.component';
@@ -24,37 +23,36 @@ import { RootComponent } from './views/root.view';
 import { SongStore } from './stores/song.store';
 
 @NgModule({
-	declarations: [
-		AppComponent,
-		LoginComponent,
-		NotFoundComponent,
-		CrudSongComponent,
-		ListSongComponent,
-		RootComponent
-	],
-	imports: [
-		BrowserModule,
-		AngularFireModule.initializeApp(environment.firebase),
-		AngularFireAuthModule,
-		AngularFirestoreModule,
-		RouterModule.forRoot(routes),
-		FormsModule,
-		HttpClientModule,
-		NgSelect2Module
-	],
-	providers: [
-		// Services
-		AuthService,
-		SweetalertService,
+    declarations: [
+        AppComponent,
+        LoginComponent,
+        NotFoundComponent,
+        CrudSongComponent,
+        ListSongComponent,
+        RootComponent,
+    ],
+    imports: [
+        BrowserModule,
+        AngularFireModule.initializeApp(environment.firebase),
+        AngularFireAuthModule,
+        AngularFirestoreModule,
+        RouterModule.forRoot(routes),
+        FormsModule,
+        HttpClientModule,
+    ],
+    providers: [
+        // Services
+        AuthService,
+        SweetalertService,
 
-		// Guards
-		AuthGuard,
+        // Guards
+        AuthGuard,
 
-		// Stores
-		AuthStore,
-		UserStore,
-		SongStore
-	],
-	bootstrap: [AppComponent]
+        // Stores
+        AuthStore,
+        UserStore,
+        SongStore,
+    ],
+    bootstrap: [AppComponent],
 })
 export class AppModule {}

@@ -5,7 +5,6 @@ import { SongStore } from 'src/app/stores/song.store';
 import { SongModel, ILinkModel } from 'src/app/models/song.model';
 import { NgForm } from '@angular/forms';
 import { categories, Category } from 'src/app/models/category.model';
-import { Select2OptionData } from 'ng-select2';
 import { first } from 'rxjs/operators';
 
 import * as quill from 'quill';
@@ -48,7 +47,7 @@ import { environment } from 'src/environments/environment';
                     <label>Categorie</label>
                     <div class="row">
                         <div class="col-md-5">
-                            <ng-select2
+                            <!--<ng-select2
                                 [options]="{
                                     multiple: true,
                                     width: 315
@@ -58,7 +57,7 @@ import { environment } from 'src/environments/environment';
                                 name="categories"
                                 [placeholder]="'Seleziona categorie'"
                             >
-                            </ng-select2>
+                            </ng-select2>-->
                         </div>
                     </div>
                 </div>
@@ -205,7 +204,7 @@ export class CrudSongComponent implements OnInit {
     song: SongModel;
     lyricEditor: any;
     chordEditor: any;
-    categoriesArray: Array<Select2OptionData>;
+    // categoriesArray: Array<Select2OptionData>;
     categories: [string];
     links: Array<ILinkModel>;
     typeModel = 'null';
@@ -349,12 +348,12 @@ export class CrudSongComponent implements OnInit {
     }
 
     categoriesLoad() {
-        this.categoriesArray = categories.map((y: Category) =>
-            Object.create({
-                id: y.value,
-                text: y.title,
-            } as Select2OptionData)
-        ) as [Select2OptionData];
+        // this.categoriesArray = categories.map((y: Category) =>
+        //     Object.create({
+        //         id: y.value,
+        //         text: y.title,
+        //     } as Select2OptionData)
+        // ) as [Select2OptionData];
     }
 
     async addOrUpdateAlgolia(song: SongModel) {
