@@ -66,3 +66,5 @@ firestore/
 firebase/
 .firebase
 .functions/lib
+
+.src/environments
